@@ -1,5 +1,5 @@
-import React from 'react'
-import {motion} from 'framer-motion'
+import React, { useRef } from 'react'
+import {motion, useInView, useScroll, useTransform } from 'framer-motion'
 
 const quote = {
     initial: {
@@ -28,7 +28,31 @@ const singleWord = {
     }
 }
 
-const AnimatedText = ({text, className=""}) => {
+const animationOrder = {
+    initial: 0,
+    midAnimation: 0.4,
+    endAnimation: 0.7
+};
+
+const AnimatedTextAndOpacity = ({text, className=""}) => {
+
+    const targetRef = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: targetRef,
+        offset: ["start end", "end start"],
+    });
+
+    const opacity = useTransform(
+        scrollYProgress,
+        [
+            animationOrder.initial,
+            animationOrder.midAnimation,
+            animationOrder.endAnimation
+        ],
+        [0, 1, 0]
+      );
+
+
   return (
     <div className='w-full mx-auto py-2 flex items-center justify-center 
     text-center overflow-hidden sm:py-0'>
@@ -36,8 +60,8 @@ const AnimatedText = ({text, className=""}) => {
         capitalize text-8xl ${className} dark:text-light`}
         variants={quote}
         initial="initial"
-        // animate="animate"
         whileInView="animate"
+        style={{opacity}}
         >
             {
                 text.split(" ").map((word, index) =>
@@ -53,4 +77,4 @@ const AnimatedText = ({text, className=""}) => {
   )
 }
 
-export default AnimatedText
+export default AnimatedTextAndOpacity
